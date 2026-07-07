@@ -17,7 +17,7 @@ export const env: EnvConfig = {
   FRONTEND_URL: process.env.FRONTEND_URL || 'http://localhost:3000',
   AI_PROVIDER: process.env.AI_PROVIDER || 'gemini',
   GEMINI_API_KEY: process.env.GEMINI_API_KEY || '',
-  GEMINI_MODEL: process.env.GEMINI_MODEL || 'gemini-2.0-flash',
+  GEMINI_MODEL: process.env.GEMINI_MODEL || 'gemini-2.5-flash',
   AI_BATCH_SIZE: parseInt(process.env.AI_BATCH_SIZE || '25', 10),
   MAX_FILE_SIZE_MB: parseInt(process.env.MAX_FILE_SIZE_MB || '5', 10),
 };
