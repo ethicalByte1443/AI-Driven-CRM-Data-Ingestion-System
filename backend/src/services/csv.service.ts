@@ -1,4 +1,5 @@
 import { parse } from 'csv-parse';
+import { CsvParseError } from '../utils/errors';
 
 export interface ParsedCsv {
   headers: string[];
@@ -20,7 +21,7 @@ export function parseCsvBuffer(buffer: Buffer): Promise<ParsedCsv> {
     const content = buffer.toString('utf-8').trim();
 
     if (!content) {
-      return reject(new Error('CSV file is empty. Please upload a file with data.'));
+      return reject(new CsvParseError('CSV file is empty. Please upload a file with data.'));
     }
 
     const records: Record<string, string>[] = [];
@@ -63,16 +64,16 @@ export function parseCsvBuffer(buffer: Buffer): Promise<ParsedCsv> {
     });
 
     parser.on('error', (err: Error) => {
-      reject(new Error(`Failed to parse CSV: ${err.message}`));
+      reject(new CsvParseError(`Failed to parse CSV: ${err.message}`));
     });
 
     parser.on('end', () => {
       if (headers.length === 0) {
-        return reject(new Error('CSV file has no headers. Please ensure the first row contains column names.'));
+        return reject(new CsvParseError('CSV file has no headers. Please ensure the first row contains column names.'));
       }
 
       if (records.length === 0) {
-        return reject(new Error('CSV file has headers but no data rows. Please add records to the file.'));
+        return reject(new CsvParseError('CSV file has headers but no data rows. Please add records to the file.'));
       }
 
       resolve({ headers, records });

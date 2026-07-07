@@ -4,6 +4,7 @@ import { CsvRecord } from '../types/csv.types';
 import { CRMRecord, SkippedRecord } from '../types/crm.types';
 import { safeJsonParse } from '../utils/json';
 import { AiKeyMissingError, AiServiceError } from '../utils/errors';
+import { validateAiBatchResponse } from '../validators/import.validator';
 
 // ─── System Prompt ───────────────────────────────────────────────────────────
 
@@ -100,12 +101,9 @@ async function extractWithGemini(
     ]);
 
     const responseText = result.response.text();
-    const parsed = safeJsonParse<AiBatchResponse>(responseText);
+    const parsed = safeJsonParse<any>(responseText);
 
-    return {
-      importedRecords: parsed.importedRecords || [],
-      skippedRecords: parsed.skippedRecords || [],
-    };
+    return validateAiBatchResponse(parsed, records);
   } catch (error) {
     if (error instanceof AiKeyMissingError) throw error;
 
@@ -124,41 +122,21 @@ function extractWithMock(
   records: CsvRecord[],
   _batchNumber: number
 ): AiBatchResponse {
-  const importedRecords: CRMRecord[] = [];
-  const skippedRecords: SkippedRecord[] = [];
+  const rawImported: any[] = [];
+  const rawSkipped: any[] = [];
 
   for (const record of records) {
     const mapped = mapRecordHeuristically(record);
-
-    // Skip if no email and no mobile
-    if (!mapped.email && !mapped.mobile_without_country_code) {
-      skippedRecords.push({
-        originalRecord: record,
-        reason: 'Missing both email and mobile number',
-      });
-      continue;
-    }
-
-    importedRecords.push({
-      created_at: mapped.created_at,
-      name: mapped.name,
-      email: mapped.email,
-      country_code: mapped.country_code,
-      mobile_without_country_code: mapped.mobile_without_country_code,
-      company: mapped.company,
-      city: mapped.city,
-      state: mapped.state,
-      country: mapped.country,
-      lead_owner: mapped.lead_owner,
-      crm_status: mapped.crm_status as CRMRecord['crm_status'],
-      crm_note: mapped.crm_note,
-      data_source: mapped.data_source as CRMRecord['data_source'],
-      possession_time: mapped.possession_time,
-      description: mapped.description,
-    });
+    rawImported.push(mapped);
   }
 
-  return { importedRecords, skippedRecords };
+  return validateAiBatchResponse(
+    {
+      importedRecords: rawImported,
+      skippedRecords: rawSkipped,
+    },
+    records
+  );
 }
 
 /**
@@ -261,7 +239,7 @@ function mapRecordHeuristically(record: CsvRecord): Record<string, string> {
       notes.push(v);
     }
     // Data source
-    else if (/^(source|data\s*source|campaign|project|property|channel)$/i.test(k)) {
+    else if (/(source|campaign|project|property|channel)/i.test(k)) {
       result.data_source = mapDataSource(v);
     }
     // Possession time

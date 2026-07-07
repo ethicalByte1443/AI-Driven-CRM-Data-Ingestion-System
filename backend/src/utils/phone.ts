@@ -40,6 +40,14 @@ export function normalizePhone(phone: string): {
   // Remove all non-digit characters except leading +
   let cleaned = phone.replace(/[^\d+]/g, '');
 
+  // Handle +1 prefix (US/Canada 10-digit mobile)
+  if (cleaned.startsWith('+1') && cleaned.length === 12) {
+    return {
+      country_code: '+1',
+      mobile_without_country_code: cleaned.slice(2),
+    };
+  }
+
   // Handle +91 prefix
   if (cleaned.startsWith('+91') && cleaned.length >= 13) {
     return {
