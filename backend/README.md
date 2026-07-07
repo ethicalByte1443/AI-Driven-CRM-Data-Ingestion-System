@@ -35,7 +35,7 @@ PORT=5001
 FRONTEND_URL=http://localhost:3000
 AI_PROVIDER=gemini # Use 'gemini' for real extraction or 'mock' for local testing
 GEMINI_API_KEY=your_gemini_api_key_here
-GEMINI_MODEL=gemini-2.0-flash
+GEMINI_MODEL=gemini-2.5-flash
 AI_BATCH_SIZE=25
 MAX_FILE_SIZE_MB=5
 ```
