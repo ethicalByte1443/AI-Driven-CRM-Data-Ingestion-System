@@ -1,0 +1,52 @@
+Customer Name,Email Address,Contact No,Remarks,Campaign,Created Date,Property Area
+Aseem Kumar,aseem@groweasy.ai,+91 99999 88888,Interested in Eden Park project,eden_park,2026-07-07 18:30:00,Eden Park
+Jane Smith,jane@techcorp.com,9876543210,Busy right now reschedule for tomorrow,meridian_tower,2026-07-06 12:00:00,Meridian Tower
+Raj Patel,raj@startup.in,,Wants onboarding demo and pricing sheet,leads_on_demand,2026-07-05 10:00:00,Sarjapur Plots
+Bob Wilson,,,,Not interested anymore,leads_on_demand,2026-07-04 15:00:00,Eden Park
+Amit Sharma,amit@sharma.co,+919123456789,Interested in varah swamy project,varah_swamy,2026-07-03 09:30:00,Varah Swamy
+Sunita Rao,sunita.rao@yahoo.com,09876543210,Callback next week,sarjapur_plots,2026-07-02 14:15:00,Sarjapur Plots
+Vijay Mallya,vijay@kingfisher.com,919999999999,Looking for premium plots in Sarjapur,sarjapur_plots,2026-07-01 16:45:00,Sarjapur
+Karan Singh,karan@singh.com,918888877777,Needs floor plan of Meridian Tower,meridian_tower,,Meridian
+Pooja Hegde,pooja@hegde.com,+1 202 555 0143,Callback after 6 PM,eden_park,2026-06-30 18:00:00,Eden
+Rohan Das,rohan@das.org,,Invalid lead check,,2026-06-29 11:20:00,
+Deepak Malhotra,,917777766666,Interested in Varah Swamy plot,varah_swamy,2026-06-28 13:10:00,Varah Swamy
+Shreya Ghoshal,shreya@singing.com,08888888888,Interested in Eden Park 3BHK,eden_park,2026-06-27 10:05:00,Eden Park
+Anil Ambani,anil@reliance.co,919876543211,Wants discount structure,meridian_tower,2026-06-26 15:30:00,Meridian
+Mukesh Ambani,mukesh@reliance.co,919876543212,Premium buyer looking for penthouse,meridian_tower,2026-06-25 17:00:00,Meridian
+Ratan Tata,ratan@tata.com,919999911111,Looking for corporate office space,,2026-06-24 11:00:00,
+Azim Premji,azim@wipro.com,+91 99999 22222,CSR projects info,,2026-06-23 09:00:00,
+Vikram Seth,vikram@books.co,09999933333,Wants to reschedule call,eden_park,2026-06-22 14:00:00,Eden Park
+Arundhati Roy,arundhati@books.co,,Book launch events info,,2026-06-21 16:00:00,
+Salman Khan,salman@beinghuman.com,919999944444,Wants site visit details,varah_swamy,2026-06-20 12:00:00,Varah Swamy
+Shah Rukh Khan,srk@redchillies.com,919999955555,Interested in Meridian Tower suite,meridian_tower,2026-06-19 18:30:00,Meridian Tower
+Aamir Khan,aamir@perfection.com,919999966666,Wants pricing calculation sheet,,2026-06-18 10:00:00,
+Virat Kohli,virat@cricket.in,+91 99999 77777,Looking for penthouse in Eden Park,eden_park,2026-06-17 15:00:00,Eden Park
+MS Dhoni,msd@csk.in,919999988888,Wants farmhouse plot details,sarjapur_plots,2026-06-16 11:30:00,Sarjapur
+Sachin Tendulkar,sachin@srt.in,919999999990,Looking for investment plots,,2026-06-15 13:45:00,
+Kapil Dev,kapil@cricket.in,,No contact info,,2026-06-14 14:00:00,
+Sunil Gavaskar,sunil@sunny.com,918888800000,Interested in Meridian Tower,meridian_tower,2026-06-13 16:15:00,Meridian
+Abhinav Bindra,abhinav@gold.in,918888811111,Sports academy space queries,,2026-06-12 10:00:00,
+Mary Kom,mary@boxer.in,+91 88888 22222,Looking for plots in Sarjapur,sarjapur_plots,2026-06-11 11:00:00,Sarjapur Plots
+Sania Mirza,sania@tennis.in,918888833333,Interested in Eden Park,eden_park,2026-06-10 12:30:00,Eden Park
+Saina Nehwal,saina@badminton.in,918888844444,Wants brochure of Varah Swamy,varah_swamy,2026-06-09 14:15:00,Varah Swamy
+PV Sindhu,sindhu@badminton.in,918888855555,Site visit scheduled next Saturday,meridian_tower,2026-06-08 15:30:00,Meridian
+Neeraj Chopra,neeraj@javelin.in,918888866666,Wants call back in evening,,2026-06-07 17:00:00,
+Viswanathan Anand,anand@chess.in,918888877777,Interested in 3BHK Meridian Tower,meridian_tower,2026-06-06 09:30:00,Meridian Tower
+Leander Paes,leander@tennis.in,,No contact details provided,,2026-06-05 10:00:00,
+Mahesh Bhupathi,mahesh@tennis.in,918888899999,Wants site layout of Eden Park,eden_park,2026-06-04 11:30:00,Eden Park
+Rohit Sharma,rohit@hitman.in,917777700000,Looking for premium villa plots,,2026-06-03 13:00:00,
+KL Rahul,kl@cricket.in,917777711111,Reschedule to next month,,2026-06-02 14:45:00,
+Jasprit Bumrah,jasprit@boom.in,+91 77777 22222,Interested in Varah Swamy plots,varah_swamy,2026-06-01 16:00:00,Varah Swamy
+Hardik Pandya,hardik@cricket.in,917777733333,Needs pricing list,eden_park,2026-05-31 18:15:00,Eden Park
+Rishabh Pant,rishabh@cricket.in,,Car accident update, callback later,,2026-05-30 10:00:00,
+Ravindra Jadeja,jaddu@cricket.in,917777755555,Wants site visit booking,sarjapur_plots,2026-05-29 11:30:00,Sarjapur Plots
+Ravichandran Ashwin,ashwin@cricket.in,917777766666,Interested in Meridian Tower,meridian_tower,2026-05-28 13:00:00,Meridian Tower
+Cheteshwar Pujara,cheteshwar@pujara.in,917777777777,Slow follow up required,,2026-05-27 14:15:00,
+Shikhar Dhawan,shikhar@cricket.in,917777788888,Interested in Eden Park,eden_park,2026-05-26 15:30:00,Eden Park
+Yuzvendra Chahal,yuzi@cricket.in,917777799999,Wants floor plan of Varah Swamy,varah_swamy,2026-05-25 17:00:00,Varah Swamy
+Kuldeep Yadav,kuldeep@cricket.in,,No contact info,,2026-05-24 18:00:00,
+Bhuvneshwar Kumar,bhuvi@cricket.in,916666600000,Interested in Meridian Tower,meridian_tower,2026-05-23 09:30:00,Meridian Tower
+Mohammed Shami,shami@cricket.in,916666611111,Site visit next Sunday,,2026-05-22 11:00:00,
+Ishant Sharma,ishant@cricket.in,916666622222,Looking for Eden Park plots,eden_park,2026-05-21 12:30:00,Eden Park
+Umesh Yadav,umesh@cricket.in,916666633333,Callback on Monday,,2026-05-20 14:00:00,
+Ajinkya Rahane,ajinkya@cricket.in,,Wants corporate demo,,2026-05-19 15:15:00,

@@ -1,0 +1,75 @@
+@import "tailwindcss";
+
+@theme inline {
+  /* GrowEasy Brand Colors */
+  --color-ge-green: #2D8B61;
+  --color-ge-green-light: #E8F5EE;
+  --color-ge-green-dark: #1B6B45;
+  --color-ge-coral: #F47458;
+  --color-ge-coral-dark: #E05A3E;
+  --color-ge-coral-light: #FEF0ED;
+
+  /* Neutral palette */
+  --color-ge-bg: #F7F8FA;
+  --color-ge-surface: #FFFFFF;
+  --color-ge-border: #E5E7EB;
+  --color-ge-border-light: #F0F0F0;
+  --color-ge-text: #1A1A2E;
+  --color-ge-text-secondary: #6B7280;
+  --color-ge-text-muted: #9CA3AF;
+
+  /* Sidebar */
+  --color-ge-sidebar-bg: #FFFFFF;
+  --color-ge-sidebar-active: #E8F5EE;
+  --color-ge-sidebar-hover: #F3F4F6;
+
+  /* Overlay */
+  --color-ge-overlay: rgba(0, 0, 0, 0.5);
+
+  /* Font */
+  --font-sans: "Inter", system-ui, -apple-system, sans-serif;
+}
+
+/* Base styles */
+html {
+  height: 100%;
+}
+
+body {
+  background-color: var(--color-ge-bg);
+  color: var(--color-ge-text);
+  font-family: var(--font-sans);
+  min-height: 100%;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #D1D5DB;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #9CA3AF;
+}
+
+/* Smooth transitions */
+* {
+  transition-property: background-color, border-color, color, box-shadow, opacity;
+  transition-duration: 150ms;
+  transition-timing-function: ease-in-out;
+}
+
+/* Table improvements */
+table {
+  border-collapse: separate;
+  border-spacing: 0;
+}
