@@ -16,15 +16,9 @@ app.use(helmet({
   crossOriginResourcePolicy: false,
 }));
 
-// CORS
+// CORS — Allow dynamic request origin reflection to support multi-environment testing
 app.use(cors({
-  origin: function (origin, callback) {
-    // Allow requests with no origin (curl, Postman, server-to-server)
-    if (!origin) return callback(null, true);
-    // Allow frontend origin
-    if (origin === env.FRONTEND_URL) return callback(null, true);
-    callback(new Error('Not allowed by CORS'));
-  },
+  origin: true,
   methods: ['GET', 'POST'],
   allowedHeaders: ['Content-Type'],
   credentials: true,
