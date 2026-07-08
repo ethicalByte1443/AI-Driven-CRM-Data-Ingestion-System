@@ -109,3 +109,33 @@ Run the unit test suite:
 npm test
 ```
 *(All 14 core tests verify CSV parsing, phone/date normalization, mock fallback mode, and batching logic).*
+
+---
+
+## 💻 How to Run the Frontend Locally
+
+### 1. Install & configure
+```bash
+cd ui-frontend
+npm install
+cp .env.local.example .env.local
+```
+Inside `.env.local`, check that your base API URL points to the backend (by default, port `5001`):
+```env
+NEXT_PUBLIC_API_BASE_URL=http://localhost:5001
+```
+
+### 2. Start the service
+```bash
+npm run dev
+```
+Open **`http://localhost:3000`** in your browser.
+
+### 3. Core Features Available:
+* **Interactive Dashboard Layout:** Sidebar navigation with collapsed/responsive view for mobile devices.
+* **Lead Sources Dashboard:** Main dashboard (`/`) displaying lead channels.
+* **Import Leads Modal:** Opens from the "Import Leads via CSV" button. Supports Drag & Drop, file picker validations (CSV format check, size check under 5MB).
+* **Sample CSV Download:** Direct link within the dropzone downloads `groweasy-sample-crm-template.csv`.
+* **Two-Step Ingestion Flow:** Upload lists and view client-side parsed preview immediately. Confirming will execute Gemini AI mapping on the backend.
+* **Compact Import Summaries:** Displays parsed totals (Success, Skipped) with interactive tables showing normalized values alongside collapsible JSON logs for skipped rows.
+* **Manage Leads Screen:** A responsive demonstration leads page located at `/manage-leads`. Includes client-side filtering by Name, Contact, or Email.
