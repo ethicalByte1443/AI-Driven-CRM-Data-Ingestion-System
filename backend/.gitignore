@@ -19,3 +19,7 @@ dist/
 *.njsproj
 *.sln
 *.sw?
+
+# Local mock persistence store
+leads.json
+
