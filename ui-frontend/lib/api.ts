@@ -1,6 +1,6 @@
 import axios from 'axios';
 import type { CsvPreviewResponse, CsvRecord } from '@/types/csv';
-import type { ImportResultResponse } from '@/types/crm';
+import type { ImportResultResponse, ImportJobResponse, ExtendedCRMRecord } from '@/types/crm';
 
 const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:5001',
@@ -38,9 +38,9 @@ export async function uploadCsvForPreview(
  */
 export async function confirmCsvImport(
   records: CsvRecord[]
-): Promise<ImportResultResponse> {
+): Promise<ImportJobResponse> {
   try {
-    const { data } = await api.post<ImportResultResponse>(
+    const { data } = await api.post<ImportJobResponse>(
       '/api/import/confirm',
       { records },
       {
@@ -102,3 +102,68 @@ function normalizeError(error: unknown): Error {
 
   return new Error('An unexpected error occurred.');
 }
+
+/**
+ * Fetch all leads from the backend.
+ */
+export async function fetchLeads(): Promise<ExtendedCRMRecord[]> {
+  try {
+    const { data } = await api.get<{ success: boolean; leads: ExtendedCRMRecord[] }>('/api/leads');
+    return data.leads;
+  } catch (error) {
+    throw normalizeError(error);
+  }
+}
+
+/**
+ * Trigger LangGraph onboarding email auto-engagement draft for a single lead.
+ */
+export async function triggerAutoEngage(
+  leadId: string
+): Promise<{ success: boolean; lead: ExtendedCRMRecord; message: string }> {
+  try {
+    const { data } = await api.post<{ success: boolean; lead: ExtendedCRMRecord; message: string }>(
+      `/api/leads/${leadId}/auto-engage`
+    );
+    return data;
+  } catch (error) {
+    throw normalizeError(error);
+  }
+}
+
+/**
+ * Approve the drafted onboarding email for a lead, updating status to SALE_DONE.
+ */
+export async function approveDraft(
+  leadId: string,
+  emailSubject: string,
+  emailDraft: string
+): Promise<{ success: boolean; lead: ExtendedCRMRecord; message: string }> {
+  try {
+    const { data } = await api.post<{ success: boolean; lead: ExtendedCRMRecord; message: string }>(
+      `/api/leads/${leadId}/approve-draft`,
+      { emailSubject, emailDraft }
+    );
+    return data;
+  } catch (error) {
+    throw normalizeError(error);
+  }
+}
+
+/**
+ * Trigger bulk engagement for multiple leads in the background.
+ */
+export async function triggerBulkAutoEngage(
+  leadIds: string[]
+): Promise<{ success: boolean; message: string }> {
+  try {
+    const { data } = await api.post<{ success: boolean; message: string }>(
+      '/api/leads/auto-engage/batch',
+      { leadIds }
+    );
+    return data;
+  } catch (error) {
+    throw normalizeError(error);
+  }
+}
+

@@ -45,3 +45,12 @@ export interface ImportResult {
   importedRecords: CRMRecord[];
   skippedRecords: SkippedRecord[];
 }
+
+export interface ExtendedCRMRecord extends CRMRecord {
+  id: string;
+  engagementStatus: 'not_engaged' | 'generating' | 'draft_ready' | 'failed';
+  emailDraft?: string | null;
+  emailSubject?: string | null;
+  engagementError?: string | null;
+}
+

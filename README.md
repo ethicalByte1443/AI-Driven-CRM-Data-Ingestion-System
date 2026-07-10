@@ -1,21 +1,28 @@
-# AI-Driven-CRM-Data-Ingestion-System
+# AI-Driven CRM Data Ingestion & Auto-Engagement System
 
-**Project Status:** 🟢 Complete & Verified | 🚀 Deployed on Vercel
+**Project Status:** 🟢 Production-Grade Features Complete | 🚀 Tested & Verified
 
----
-
-## 📋 Product Overview (For Product Owners)
-
-In B2B and CRM platforms, customer upload lists come in highly irregular formats. Column headers like `Full Name`, `lead`, `customer`, `tel`, `whatsapp`, `mail`, or `submitted_at` make standard hard-coded import templates break.
-
-This application is an **AI-Powered CRM Lead Ingestor**. It allows users to upload **any valid CSV file** with **any layout or column naming convention**.
-1. **Instant Preview:** The system immediately parses the uploaded file and shows a preview table of the raw records (done locally on the server in milliseconds, costing $0 in AI fees).
-2. **AI-Powered Mapping:** Once the user reviews and confirms, the records are sent to Gemini AI in optimal batch sizes. The AI maps the mismatched headers, cleans the fields, resolves multiple values, and assigns standard values.
-3. **Data Safety Guardrails:** Strict post-AI validation checks discard low-quality leads and format phone numbers and dates to a single consistent CRM standard.
+This platform is a high-scale, enterprise-ready **AI-Powered CRM Lead Ingestor and Engagement Engine**. It handles massive, irregularly formatted CSV uploads asynchronously and runs intelligent agentic workflows to draft compliance-checked onboarding emails.
 
 ---
 
-## 🛠️ Technical Architecture & Pipeline
+## 📋 Features
+
+### 1. Asynchronous Task Queue & Real-Time Progress (BullMQ + Redis + WS)
+*   **Decoupled Ingestion:** File processing is fully offloaded to a background worker pool using **BullMQ** and **Redis**. The web server remains responsive, preventing request timeouts on large files.
+*   **Real-Time Streaming:** The frontend connects via **WebSockets** to subscribe to job progress. The UI renders a dynamic progress bar showing the active batch count and real-time success/skip metrics.
+*   **Rate-Limit Protection:** Worker concurrency is set to `1` to prevent hitting downstream LLM provider rate limits (`429 Too Many Requests`).
+
+### 2. Multi-Agent Lead Auto-Responder (LangGraph)
+*   **Agentic State Machine:** After leads are successfully parsed and stored in the database, users can trigger an auto-engagement workflow built on **LangGraph**:
+    1.  **Lead Analyzer:** Evaluates the lead's company and category to infer target audience and business challenges.
+    2.  **Email Copywriter:** Generates a friendly, personalized outreach draft based on retrieved campaign templates.
+    3.  **Compliance & QA Guardrail:** Evaluates the draft against strict rules (ensuring no template bracket placeholders, greeting consistency, opt-out notices, and non-spammy tone). If a check fails, the workflow loops back to rewrite up to 3 times.
+*   **Draft Review Drawer:** A slide-over review panel on the frontend lets agents inspect, edit, and click "Approve & Send" to finalize emails, updating statuses directly in the CRM database.
+
+---
+
+## 🛠️ Technical Architecture
 
 ```mermaid
 graph TD
@@ -23,119 +30,108 @@ graph TD
     B --> C[Preview Endpoint: /api/import/preview]
     C -->|Return headers & first 10 rows| D[UI Preview Table]
     D -->|User Clicks Confirm| E[Confirm Endpoint: /api/import/confirm]
-    E --> F[Batcher: Split into AI_BATCH_SIZE]
-    F --> G[Gemini 2.5 Flash API Call]
-    G --> H[Response Parser & Code Fence Stripper]
-    H --> I[Zod Validation & Normalization Pipeline]
-    I -->|Valid Leads| J[importedRecords Array]
-    I -->|Invalid Leads/Errors| K[skippedRecords Array]
-    J --> L[JSON Result to UI]
-    K --> L
+    E -->|Enqueue Job| F[BullMQ: csv-import-queue]
+    F -->|Process asynchronously| G[BullMQ Worker]
+    G -->|Gemini AI Batch Call| H[Gemini 2.5 Flash API]
+    G -->|Update Job Progress| I[Redis Database]
+    I -->|Emit Events| J[WebSocket Server]
+    J -->|Real-Time Stats| K[Frontend Progress Bar]
+    G -->|Save Leads| L[Local Persistence: leads.json]
+    
+    M[Leads Dashboard] -->|Trigger Auto-Engage| N[LangGraph Workflow]
+    N -->|Step 1| O[Lead Analyzer Node]
+    O -->|Step 2| P[Email Copywriter Node]
+    P -->|Step 3| Q[Compliance QA Node]
+    Q -->|Fail| P
+    Q -->|Pass| R[Save Onboarding Email Draft]
 ```
 
-### 📊 Ingestion Pipeline Flow (Text Representation)
+### Ingestion & Processing Pipeline Flow
 ```txt
-[ Upload CSV ] 
-      │
-      ▼
-[ Memory Parser (csv-parse) ] ───► Preview: /api/import/preview ───► Mapped UI Preview Table
-                                                                             │ (Click Confirm)
-                                                                             ▼
-                                                                 Confirm: /api/import/confirm
-                                                                             │
-                                                                             ▼
-                                                                 [ Split into Batches ]
-                                                                             │
-                                                                             ▼
-                                                                 [ Gemini 2.5 Flash API ]
-                                                                             │
-                                                                             ▼
-                                                                 [ JSON Code Fence Stripper ]
-                                                                             │
-                                                                             ▼
-                                                                 [ Zod Validator & Normalizer ]
-                                                                   ├── Verify Email / Mobile exists
-                                                                   ├── Format Date to ISO string
-                                                                   └── Normalize Phone with Country Code
-                                                                             │
-                                                                     ┌───────┴───────┐
-                                                                     ▼               ▼
-                                                              [Valid Leads]   [Skipped Leads]
-                                                              (Imported list)  (Reason details)
+[ CSV Upload ] ──► Preview (csv-parse) ──► UI Table Preview
+                                                │ (Confirm)
+                                                ▼
+                                       [ BullMQ Queue ] ──► Return Job ID
+                                                │
+                                        (Async Worker)
+                                                │
+                                                ├──► Gemini 2.5 Flash API (AI Mapping)
+                                                ├──► Zod Normalization & Validation
+                                                ├──► Save to leads.json database
+                                                └──► Stream progress updates via WebSocket
 ```
-
-### 1. The CSV Parse Engine
-* Reads files in-memory using `multer.memoryStorage()`. No temporary disk-space leak or container security threat from persistent filesystem writes.
-* Handled via standard RFC 4180 streaming rules—supporting double quotes, commas inside fields, and empty column buffers.
-
-### 2. The Gemini AI Context Mapping (Model: `gemini-2.5-flash`)
-* We utilize **Gemini 2.5 Flash** with low temperature configuration (`0.1`) to ensure highly deterministic outputs.
-* Prompt directives guide the model to understand alternative headers, identify enums (statuses, campaign tags), map multi-value fields (e.g. secondary email goes to `crm_note`), and format fields.
-
-### 3. Zod Post-Validation Guardrail
-To prevent LLM hallucination or schema deviation, all output fields run through a post-AI validation pipeline:
-* **Contact Requirement:** If a lead lacks both `email` and `mobile_without_country_code`, it is rejected and pushed to `skippedRecords` with the reason: `Missing both email and mobile number`.
-* **Phone Normalization:** Applies regex filters to format international and Indian numbers (correcting `+91`, `91`, `0` prefixes).
-* **Date Normalization:** ISO conversions ensure that standard JavaScript constructors `new Date(created_at)` never return `NaN`.
-* **Resilient Batches:** If one batch fails (due to external rate limits or token limits), the orchestrator captures the error and places all records of that batch in the `skippedRecords` array with the detailed failure description, continuing the loop for the remaining batches.
 
 ---
 
-## 🚀 How to Run the Backend Locally
+## 🚀 How to Run Locally
 
-### 1. Install & configure
+### 1. Start Redis
+Make sure a local Redis server is running, or get a remote endpoint.
+
+**Using Docker (Recommended):**
+```bash
+docker run -d --name crm-redis -p 6379:6379 redis
+```
+
+**Using Upstash (Cloud):**
+Sign up at [Upstash](https://upstash.com/), create a free Redis database, and copy the endpoint host, port, and password.
+
+---
+
+### 2. Configure & Run the Backend
+Go to the `backend` folder:
 ```bash
 cd backend
 npm install
 cp .env.example .env
 ```
-Inside `.env`, configure your Gemini API Key:
+
+Configure your `.env` variables:
 ```env
 PORT=5001
-GEMINI_API_KEY=your_api_key_here
-GEMINI_MODEL=gemini-2.5-flash
+FRONTEND_URL=http://localhost:3000
 AI_PROVIDER=gemini
+GEMINI_API_KEY=your_gemini_api_key
+GEMINI_MODEL=gemini-2.5-flash
 AI_BATCH_SIZE=25
-```
+MAX_FILE_SIZE_MB=5
 
-### 2. Start the service
+# Redis Configuration (For BullMQ queues)
+REDIS_HOST=localhost
+REDIS_PORT=6379
+REDIS_PASSWORD=
+```
+*(Note: If using Upstash, set your `REDIS_HOST` to your clean hostname, e.g. `your-db.upstash.io`, set `REDIS_PORT=6379`, and fill in `REDIS_PASSWORD`)*
+
+Start the backend:
 ```bash
 npm run dev
 ```
+*(The backend will automatically start the background queue worker and attach the WebSocket server).*
 
-### 3. Verification
-Run the unit test suite:
+Run backend verification tests:
 ```bash
 npm test
 ```
-*(All 14 core tests verify CSV parsing, phone/date normalization, mock fallback mode, and batching logic).*
+*(Runs 18 unit tests covering CSV parser, date/phone normalizations, AI extraction, Lead Store persistence, and LangGraph mock executions).*
 
 ---
 
-## 💻 How to Run the Frontend Locally
-
-### 1. Install & configure
+### 3. Configure & Run the Frontend
+Go to the `ui-frontend` folder:
 ```bash
-cd ui-frontend
+cd ../ui-frontend
 npm install
 cp .env.local.example .env.local
 ```
-Inside `.env.local`, check that your base API URL points to the backend (by default, port `5001`):
+
+Ensure the backend API target is set in `.env.local`:
 ```env
 NEXT_PUBLIC_API_BASE_URL=http://localhost:5001
 ```
 
-### 2. Start the service
+Start the frontend:
 ```bash
 npm run dev
 ```
 Open **`http://localhost:3000`** in your browser.
-
-### 3. Core Features Available:
-* **Interactive Dashboard Layout:** Sidebar navigation with collapsed/responsive view for mobile devices.
-* **Lead Sources Dashboard:** Main dashboard (`/`) displaying lead channels.
-* **Import Leads Modal:** Opens from the "Import Leads via CSV" button. Supports Drag & Drop, file picker validations (CSV format check, size check under 5MB).
-* **Sample CSV Download:** Direct link within the dropzone downloads `groweasy-sample-crm-template.csv`.
-* **Two-Step Ingestion Flow:** Upload lists and view client-side parsed preview immediately. Confirming will execute Gemini AI mapping on the backend.
-* **Compact Import Summaries:** Displays parsed totals (Success, Skipped) with interactive tables showing normalized values alongside collapsible JSON logs for skipped rows.
-* **Manage Leads Screen:** A responsive demonstration leads page located at `/manage-leads`. Includes client-side filtering by Name, Contact, or Email.

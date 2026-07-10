@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { parseCsvBuffer } from '../services/csv.service';
 import { processImport } from '../services/import.service';
 import { CsvPreviewResponse } from '../types/csv.types';
+import { importQueue } from '../queues/import.queue';
 
 /**
  * POST /api/import/preview
@@ -47,8 +48,8 @@ export async function previewCsv(
 /**
  * POST /api/import/confirm
  *
- * Validates request body (records array), sends to import service
- * for AI-powered CRM extraction, returns structured result.
+ * Validates request body (records array), enqueues the records for
+ * AI-powered background processing via BullMQ, and returns a jobId.
  */
 export async function confirmImport(
   req: Request,
@@ -58,9 +59,22 @@ export async function confirmImport(
   try {
     const { records } = req.body;
 
-    const result = await processImport(records);
+    if (!records || !Array.isArray(records) || records.length === 0) {
+      res.status(400).json({
+        success: false,
+        message: 'No records provided for import.',
+      });
+      return;
+    }
 
-    res.json(result);
+    // Add job to the BullMQ processing queue
+    const job = await importQueue.add('process-import', { records });
+
+    res.status(202).json({
+      success: true,
+      jobId: job.id,
+      message: 'Import processing started in the background.',
+    });
   } catch (error) {
     next(error);
   }

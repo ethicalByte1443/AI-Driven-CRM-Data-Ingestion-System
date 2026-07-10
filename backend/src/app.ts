@@ -5,6 +5,7 @@ import pinoHttp from 'pino-http';
 import { env } from './config/env';
 import { healthRouter } from './routes/health.routes';
 import { importRouter } from './routes/import.routes';
+import { leadRouter } from './routes/lead.routes';
 import { errorHandler } from './middleware/error.middleware';
 
 const app = express();
@@ -41,6 +42,8 @@ app.use(express.json({ limit: '10mb' }));
 // Routes
 app.use('/', healthRouter);
 app.use('/api/import', importRouter);
+app.use('/api/leads', leadRouter);
+
 
 // 404 handler for unknown routes
 app.use((_req: express.Request, res: express.Response) => {
